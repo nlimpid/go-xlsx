@@ -1,4 +1,4 @@
-package xlsx_parser
+package go_xlsx
 
 import (
 	"encoding"

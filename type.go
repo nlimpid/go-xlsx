@@ -1,4 +1,5 @@
-package xlsx_parser
+package go_xlsx
+
 
 import (
 	"github.com/sirupsen/logrus"

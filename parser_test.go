@@ -1,6 +1,7 @@
-package xlsx_parser
+package go_xlsx
 
 import (
+	"github.com/magiconair/properties/assert"
 	"github.com/tealeg/xlsx"
 	"testing"
 )
@@ -15,10 +16,11 @@ type Xlsx struct {
 
 func TestUnmarshal(t *testing.T) {
 	xlsxFile, err := xlsx.OpenFile("file.xlsx")
-	if err != nil {
-		t.Errorf("open file err = %v\n", err)
+	assert.Equal(t, err, nil)
+	v := make([]Xlsx, 10)
+	err = Unmarshal(xlsxFile, &v)
+	assert.Equal(t, err ,nil)
+	for _, val := range v {
+		t.Logf("v : %+v", val)
 	}
-	v := Xlsx{}
-	Unmarshal(xlsxFile, &v)
-	t.Logf("v : %+v", v)
 }

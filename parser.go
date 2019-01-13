@@ -1,4 +1,4 @@
-package xlsx_parser
+package go_xlsx
 
 import (
 	"github.com/sirupsen/logrus"
@@ -8,43 +8,50 @@ import (
 )
 
 func Unmarshal(f *xlsx.File, v interface{}) error {
+	valueV := reflect.ValueOf(v)
+	valueVV := reflect.Indirect(valueV)
+
 	for _, sheet := range f.Sheets {
-		for _, row := range sheet.Rows {
+		for index, row := range sheet.Rows {
 			if nil == row {
 				break
 			}
 			for k, val := range row.Cells {
-				SetValue(k, val.Value, v)
+				SetValue(k, val, valueVV.Index(index))
 			}
 		}
 	}
 	return nil
 }
 
-func SetValue(i int, value string, v interface{}) {
+func SetValue(i int, value *xlsx.Cell, v reflect.Value) {
 	// TODO: interface judge
-	tv := reflect.ValueOf(v)
-	logrus.Infof("i: %v", i)
+	//tv := reflect.ValueOf(v)
+	tv := reflect.Indirect(v)
+	logrus.Infof("i: %v, num %v", i, tv.NumField())
 	if reflect.Indirect(tv).NumField() < i-1 {
 		return
 	}
 	stv := reflect.Indirect(tv).Field(i)
-	u, _, _ := indirect(stv, false)
-	if u != nil {
-		err := u.UnmarshalXlsx(value)
-		logrus.Errorf("err: %v", err)
-	}
+	// handle cunstomer unmarshal
+	//u, _, _ := indirect(stv, false)
+	//if u != nil {
+	//	err := u.UnmarshalXlsx(value)
+	//	logrus.Errorf("err: %v", err)
+	//}
 	if stv.Kind() == reflect.Uint64 {
-		xx, _ := strconv.ParseUint(value, 10, 64)
+
+		strin, _ := value. GeneralNumericWithoutScientific()
+		xx, _ := strconv.ParseUint(strin, 10, 64)
 		stv.SetUint(xx)
 	}
 	if stv.Kind() == reflect.Int8 {
-		xx, _ := strconv.ParseInt(value, 10, 8)
+		xx, _ := strconv.ParseInt(value.Value, 10, 8)
 		stv.SetInt(xx)
 	}
 	if stv.Kind() == reflect.String {
 		// handle time
-		stv.SetString(value)
+		stv.SetString(value.Value)
 	}
 
 }
