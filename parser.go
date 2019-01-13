@@ -11,13 +11,14 @@ func Unmarshal(f *xlsx.File, v interface{}) error {
 	valueV := reflect.ValueOf(v)
 	valueVV := reflect.Indirect(valueV)
 
-	for _, sheet := range f.Sheets {
+	for sKey, sheet := range f.Sheets {
+		cellValue := valueVV.Index(sKey)
 		for index, row := range sheet.Rows {
 			if nil == row {
 				break
 			}
 			for k, val := range row.Cells {
-				SetValue(k, val, valueVV.Index(index))
+				SetValue(k, val, cellValue.Index(index))
 			}
 		}
 	}
@@ -33,12 +34,12 @@ func SetValue(i int, value *xlsx.Cell, v reflect.Value) {
 		return
 	}
 	stv := reflect.Indirect(tv).Field(i)
-	// handle cunstomer unmarshal
-	//u, _, _ := indirect(stv, false)
-	//if u != nil {
-	//	err := u.UnmarshalXlsx(value)
-	//	logrus.Errorf("err: %v", err)
-	//}
+	//handle cunstomer unmarshal
+	u, _, _ := indirect(stv, false)
+	if u != nil {
+		err := u.UnmarshalXlsx(value.Value)
+		logrus.Errorf("err: %v", err)
+	}
 	if stv.Kind() == reflect.Uint64 {
 
 		strin, _ := value. GeneralNumericWithoutScientific()
@@ -50,7 +51,6 @@ func SetValue(i int, value *xlsx.Cell, v reflect.Value) {
 		stv.SetInt(xx)
 	}
 	if stv.Kind() == reflect.String {
-		// handle time
 		stv.SetString(value.Value)
 	}
 

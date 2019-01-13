@@ -14,13 +14,13 @@ type xlsxTime struct {
 
 func (x *xlsxTime) UnmarshalXlsx(data string) error {
 	// Ignore null, like in the main JSON package.
-	if string(data) == "null" {
+	if string(data) == "null" || string(data) == "" {
 		return nil
 	}
 	// Fractional seconds are handled implicitly by Parse.
 	var err error
 	t, err := strconv.ParseFloat(string(data), 10)
-	x.Time = xlsx.TimeFromExcelTime(t, true)
+	x.Time = xlsx.TimeFromExcelTime(t, false)
 	logrus.Infof("x.Time: %v", x.Time)
 	return err
 }

@@ -17,7 +17,10 @@ type Xlsx struct {
 func TestUnmarshal(t *testing.T) {
 	xlsxFile, err := xlsx.OpenFile("file.xlsx")
 	assert.Equal(t, err, nil)
-	v := make([]Xlsx, 10)
+	v := make([][]Xlsx, 10)
+	for k := range v {
+		v[k] = make([]Xlsx, 10)
+	}
 	err = Unmarshal(xlsxFile, &v)
 	assert.Equal(t, err ,nil)
 	for _, val := range v {
