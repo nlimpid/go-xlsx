@@ -24,6 +24,8 @@ func TestUnmarshal(t *testing.T) {
 	err = Unmarshal(xlsxFile, &v)
 	assert.Equal(t, err ,nil)
 	for _, val := range v {
-		t.Logf("v : %+v", val)
+		for _, val2 := range val {
+			t.Logf("v : %+v", val2)
+		}
 	}
 }

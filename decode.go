@@ -2,7 +2,6 @@ package go_xlsx
 
 import (
 	"encoding"
-	"github.com/sirupsen/logrus"
 	"reflect"
 )
 
@@ -66,10 +65,9 @@ func indirect(v reflect.Value, decodingNull bool) (Unmarshaler, encoding.TextUnm
 		if v.IsNil() {
 			v.Set(reflect.New(v.Type().Elem()))
 		}
-		logrus.Infof("v.Type().NumMethod(): %v", v.Type().NumMethod())
 		if v.Type().NumMethod() > 0 {
 			if u, ok := v.Interface().(Unmarshaler); ok {
-				logrus.Infof("v.Type().NumMethod(): %v", ok)
+				//logrus.Infof("v.Type().NumMethod(): %v", ok)
 				return u, nil, reflect.Value{}
 			}
 			if !decodingNull {

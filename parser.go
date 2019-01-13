@@ -17,8 +17,25 @@ func Unmarshal(f *xlsx.File, v interface{}) error {
 			if nil == row {
 				break
 			}
+			logrus.Infof("index: %v cap: %v", index, cellValue.Cap())
+			// Get element of array, growing if necessary.
+			// Grow slice if necessary
+			if index >= cellValue.Cap() {
+				newcap := cellValue.Cap() + cellValue.Cap()/2
+				if newcap < 4 {
+					newcap = 4
+				}
+				newcellValue := reflect.MakeSlice(cellValue.Type(), cellValue.Len(), newcap)
+				reflect.Copy(newcellValue, cellValue)
+				cellValue.Set(newcellValue)
+			}
+			if index >= cellValue.Len() {
+				cellValue.SetLen(index + 1)
+			}
 			for k, val := range row.Cells {
-				SetValue(k, val, cellValue.Index(index))
+				if k < cellValue.Len() {
+					SetValue(k, val, cellValue.Index(index))
+				}
 			}
 		}
 	}
@@ -29,7 +46,7 @@ func SetValue(i int, value *xlsx.Cell, v reflect.Value) {
 	// TODO: interface judge
 	//tv := reflect.ValueOf(v)
 	tv := reflect.Indirect(v)
-	logrus.Infof("i: %v, num %v", i, tv.NumField())
+	//logrus.Infof("i: %v, num %v", i, tv.NumField())
 	if reflect.Indirect(tv).NumField() < i-1 {
 		return
 	}
@@ -38,7 +55,9 @@ func SetValue(i int, value *xlsx.Cell, v reflect.Value) {
 	u, _, _ := indirect(stv, false)
 	if u != nil {
 		err := u.UnmarshalXlsx(value.Value)
-		logrus.Errorf("err: %v", err)
+		if err != nil {
+			logrus.Errorf("err: %v", err)
+		}
 	}
 	if stv.Kind() == reflect.Uint64 {
 
