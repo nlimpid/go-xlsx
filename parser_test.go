@@ -1,17 +1,18 @@
 package go_xlsx
 
 import (
+	"testing"
+
 	"github.com/magiconair/properties/assert"
 	"github.com/tealeg/xlsx"
-	"testing"
 )
 
 type Xlsx struct {
-	OrderID        uint64
-	Status         int8
-	CreateTime     xlsxTime
-	ExpressCompany string
-	ExpressNumber  string
+	Status         int8     `xlsx:"status"`
+	OrderID        uint64   `xlsx:"order_id"`
+	CreateTime     xlsxTime `xlsx:"create_time"`
+	ExpressCompany string   `xlsx:"express_company"`
+	ExpressNumber  string   `xlsx:"物流号"`
 }
 
 func TestUnmarshal(t *testing.T) {
@@ -22,10 +23,12 @@ func TestUnmarshal(t *testing.T) {
 		v[k] = make([]Xlsx, 10)
 	}
 	err = Unmarshal(xlsxFile, &v)
-	assert.Equal(t, err ,nil)
+	assert.Equal(t, err, nil)
 	for _, val := range v {
 		for _, val2 := range val {
-			t.Logf("v : %+v", val2)
+			if val2.Status != 0 {
+				t.Logf("v : %+v, express_number: %v", val2.Status, val2.ExpressNumber)
+			}
 		}
 	}
 }

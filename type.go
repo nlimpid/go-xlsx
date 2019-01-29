@@ -1,11 +1,10 @@
 package go_xlsx
 
-
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/tealeg/xlsx"
 	"strconv"
 	"time"
+
+	"github.com/tealeg/xlsx"
 )
 
 type xlsxTime struct {
@@ -21,6 +20,5 @@ func (x *xlsxTime) UnmarshalXlsx(data string) error {
 	var err error
 	t, err := strconv.ParseFloat(string(data), 10)
 	x.Time = xlsx.TimeFromExcelTime(t, false)
-	logrus.Infof("x.Time: %v", x.Time)
 	return err
 }
